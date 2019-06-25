@@ -6,3 +6,4 @@ Hands on experience with GraphQL
 - [ ] Integrate GoodReads API for cover of tha book and other details
 - [ ] Validate Input fields while adding books
 - [ ] Use Material UI for tabs
+- [ ] Track traffic inflo to the site may be Google Analytics
