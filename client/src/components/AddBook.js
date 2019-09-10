@@ -1,6 +1,6 @@
 import React from 'react';
 import { graphql, compose } from 'react-apollo';
-import { getAuthorsQuery, addBookMutation, getBooksQuery } from './../queries/queries'
+import { getAuthorsQuery, addBookMutation, getBooksQuery } from './../queries/queries';
 
 class AddBook extends React.Component{
     constructor(props) {
@@ -11,16 +11,16 @@ class AddBook extends React.Component{
             authorId: ''
         }
     }
-    displayAuthors() {
+    displayAuthors = () => {
         var data = this.props.getAuthorsQuery;
         console.log(data);
-        if(data.loading){
-            return (<option disabled>Loading Authors.....</option>);
-        }
-        else {
+        if(!data.loading && data.networkStatus === 7){
             return data.authors.map((author) => {
                 return( <option key={Math.random()} value={author.id}>{author.name}</option> )
             })
+        }
+        else {
+            return (<option disabled>Loading Authors.....</option>);
         }
     }
     handleChange = (e) => {
@@ -28,20 +28,23 @@ class AddBook extends React.Component{
         this.setState({ [name]: value });
     }
     submitForm = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         const { bookName, genre, authorId } = this.state;
-        this.props.addBookMutation({
-            variables : {
-                name: bookName, 
-                genre: genre,
-                authorId: authorId
-            },
-            refetchQueries: [{ query: getBooksQuery }]
+        if(bookName !== '' && genre !== '' && authorId !=='') {
+            this.props.addBookMutation({
+                variables : {
+                    name: bookName, 
+                    genre: genre,
+                    authorId: authorId
+                },
+                refetchQueries: [{ query: getBooksQuery }] 
+            }, () => {
+                this.setState({ bookName: '', genre: '', authorId: ''})
+            });
         }
-        // , () => {
-        //     this.setState({ bookName: '', genre: '', authorId: ''})
-        // }
-        );
+        else {
+            alert("Please enter all the details");
+        }
     }
     render() {
         const { bookName, genre, authorId } = this.state;
@@ -50,11 +53,17 @@ class AddBook extends React.Component{
                 <form id="add-book" onSubmit={this.submitForm}>
                     <div className="field">
                         <label>Book Name:</label>
-                        <input type="text" name="bookName" value={bookName} onChange={this.handleChange}/>
+                        <input type="text" 
+                            name="bookName" 
+                            value={bookName} 
+                            onChange={this.handleChange}/>
                     </div>
                     <div className="field">
                         <label>Genre:</label>
-                        <input type="text" name="genre" value={genre} onChange={this.handleChange}/>
+                        <input type="text" 
+                            name="genre" 
+                            value={genre} 
+                            onChange={this.handleChange}/>
                     </div>
                     <div className="field">
                         <label>Author:</label>
@@ -71,6 +80,6 @@ class AddBook extends React.Component{
 }
 
 export default compose(
-    graphql(getAuthorsQuery, { name: "getAuthorsQuery"}),
-    graphql(addBookMutation, { name: "addBookMutation"})
+    graphql(getAuthorsQuery, { name: "getAuthorsQuery" }),
+    graphql(addBookMutation, { name: "addBookMutation" })
 )(AddBook)

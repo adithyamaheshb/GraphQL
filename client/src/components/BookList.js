@@ -14,15 +14,15 @@ class BookList extends React.Component{
   }
   displayData() {
     var data = this.props.data;
-    if(data.loading) {
-      return <div>Loading Books.....</div>
-    }
-    else {
+    if(!data.loading && data.networkStatus === 7) {
       return data.books.map((book, b) => {
         return (
           <li key={Math.random()} onClick={() => this.setState({ selectedBook: book.id })}>{book.name}</li>
         )
       })
+    }
+    else {
+      return <div>Loading Books.....</div>
     }
   }
   render() {
